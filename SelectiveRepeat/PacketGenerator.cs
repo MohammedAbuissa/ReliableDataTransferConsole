@@ -35,6 +35,15 @@ namespace Utility
                     Trunk.Add(new byte[PacketSize]);
             }
         }
+        public MemoryStream GetData()
+        {
+            MemoryStream ms = new MemoryStream();
+            foreach(byte[] packet in Trunk)
+            {
+                ms.Write(packet, 0, packet.Length);
+            }
+            return ms;
+        }
         public void Reset()
         {
             LastAccess = 0;

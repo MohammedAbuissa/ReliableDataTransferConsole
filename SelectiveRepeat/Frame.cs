@@ -9,7 +9,7 @@ namespace SelectiveRepeat
     class Frame
     {
         public byte SequenceNumber { get; private set; }
-        private byte[] Packet;
+        public byte[] Packet { get; set; }
         private byte _Counter;
         public byte Counter
         {
@@ -25,12 +25,15 @@ namespace SelectiveRepeat
         }
         public bool Received { get; set; }
         public byte[] Data { get; private set; }
-        public Frame(byte SequenceNumber, byte[] Packet)
+        public Frame(byte SequenceNumber)
         {
             Counter = 0;
             this.SequenceNumber = SequenceNumber;
-            this.Packet = Packet;
             Received = false;
+        }
+        public Frame(byte SequenceNumber, byte[] Packet):this(SequenceNumber)
+        {
+            this.Packet = Packet;
             Data = new byte[Packet.Length + 1];
             Data[0] = SequenceNumber;
             for (int i = 0; i < Packet.Length; i++)

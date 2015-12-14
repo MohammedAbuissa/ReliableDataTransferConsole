@@ -12,7 +12,15 @@ namespace ReliableDataTransfer
     {
         static void Main(string[] args)
         {
-            RunServer();
+            int k =  int.Parse(Console.ReadLine().Trim());
+            if (k==0)
+            {
+                RunServer();
+            }
+            else
+            {
+                RunClient();
+            }
             Console.ReadLine();
         }
 
@@ -70,6 +78,19 @@ namespace ReliableDataTransfer
             Sender S = new Sender(pt, NumberOfInterval, ServerPort,
                 new System.Net.IPAddress(ClientAddress), ClientPort
                 , WindowSize, Probability, Seed);
+        }
+        static void RunClient()
+        {
+            Receiver R = new Receiver(5001, 22, 
+                new System.Net.IPAddress(new byte[] { 127,0,0,1}), 5000, 2);
+            R.Receive();
+            MemoryStream ms = R.ReceivedData.GetData();
+            using (FileStream stream = new FileStream("Result.txt",FileMode.OpenOrCreate))
+            {
+                ms.WriteTo(stream);
+                stream.Close();
+            }
+            ms.Dispose();
         }
     }
 }
