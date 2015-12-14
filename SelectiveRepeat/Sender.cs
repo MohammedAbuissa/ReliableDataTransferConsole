@@ -100,7 +100,10 @@ namespace SelectiveRepeat
                 {
                     ExpectedSequenceAck[i] = (byte)((Base + i) % (SequenceNumberRange));
                 }
+#if DEBUG
                 Console.WriteLine("waiting for ack");
+#endif
+
                 ReceiveSocket.ReceiveFrom(buffer, ref Garbage);
                 if(ExpectedSequenceAck.Contains(buffer[0]))
                 {
@@ -125,13 +128,19 @@ namespace SelectiveRepeat
                 if (Me)//AckReceiver
                 {
                     //#todo: move the window
+#if DEBUG
                     Console.WriteLine("Ack " + DeliverTo);
+#endif
+
                     Frame dummy = Buffer.Find(x => x.SequenceNumber == DeliverTo);
                     if(dummy != null)
                         dummy.Received = true;
                     while (Buffer.Count>0 && Buffer[0].Received)
                     {
+#if DEBUG
                         Console.WriteLine("moving window");
+#endif
+                        
                         Buffer.RemoveAt(0);
                         Base++;
                         byte[] temporary = Packet.NextPacket;
@@ -148,6 +157,7 @@ namespace SelectiveRepeat
                     {
                         EndOfFile = true;
                         AckTimer.Stop();
+                        AckTimer.Dispose();
                     }
                         
                 }
@@ -158,8 +168,11 @@ namespace SelectiveRepeat
                     List<Frame> dummy = Buffer.FindAll(x => (x.Counter == 0 && !x.Received));
                     foreach (var item in dummy)
                     {
+#if DEBUG
                         Console.WriteLine("reSending packet # " + item.SequenceNumber);
-                        if(R.Next(101)>Probability)
+#endif
+
+                        if (R.Next(101)>Probability)
                             SendSocket.SendTo(item.Data, ClientAddress);
                         item.Counter = NumberOfInterval;
                     }

@@ -6,33 +6,42 @@ using System.Threading.Tasks;
 using System.IO;
 using Utility;
 using SelectiveRepeat;
+using System.Diagnostics;
 namespace ReliableDataTransfer
 {
     class Program
     {
         static void Main(string[] args)
         {
+            Stopwatch sw = new Stopwatch();
             int k =  int.Parse(Console.ReadLine().Trim());
             if (k==0)
             {
+                sw.Start();
                 RunServer();
+                sw.Stop();
             }
             else
             {
+                sw.Start();   
                 RunClient();
+                sw.Stop();
             }
+            Console.WriteLine("Done "+ sw.Elapsed.Ticks);
             Console.ReadLine();
         }
 
         static void RunServer()
         {
+            Console.WriteLine("Insert file name");
+            string Path = Console.ReadLine();
             int PacketSize;
             do
             {
                 Console.WriteLine("Insert the width of packet");
             } while (!int.TryParse(Console.ReadLine().Trim(),out PacketSize));
             PacketTrunk pt = new PacketTrunk(PacketSize);
-            using (FileStream stream = File.Open(@"Packet.txt",FileMode.Open))
+            using (FileStream stream = File.Open(Path,FileMode.Open))
             {
                 pt.AddData(stream);
             }
@@ -81,16 +90,47 @@ namespace ReliableDataTransfer
         }
         static void RunClient()
         {
-            Receiver R = new Receiver(5001, 22, 
-                new System.Net.IPAddress(new byte[] { 127,0,0,1}), 5000, 2);
+            int ClientPort;
+            do
+            {
+                Console.WriteLine("Insert Client pory=t");
+            } while (!int.TryParse(Console.ReadLine().Trim(), out ClientPort));
+            int PacketSize;
+            do
+            {
+                Console.WriteLine("Insert PacketSize");
+            } while (!int.TryParse(Console.ReadLine().Trim(), out PacketSize));
+            byte[] ServerIp = new byte[4];
+            for (int i = 0; i < 4; i++)
+            {
+                do
+                {
+                    Console.WriteLine("Insert "+i+"byte of server address");
+                } while (!byte.TryParse(Console.ReadLine().Trim(), out ServerIp[i]));
+            }
+            int ServerPort;
+            do
+            {
+                Console.WriteLine("Insert ServerPort");
+            } while (!int.TryParse(Console.ReadLine().Trim(), out ServerPort));
+            byte WindowSize;
+            do
+            {
+                Console.WriteLine("Insert Windows Size");
+            } while (!byte.TryParse(Console.ReadLine().Trim(), out WindowSize));
+            Console.WriteLine("Insert Name of File to write the result");
+            string File = Console.ReadLine();
+            Receiver R = new Receiver(ClientPort,PacketSize,
+                new System.Net.IPAddress(ServerIp), ServerPort,WindowSize);
             R.Receive();
             MemoryStream ms = R.ReceivedData.GetData();
-            using (FileStream stream = new FileStream("Result.txt",FileMode.OpenOrCreate))
+            using (FileStream stream = new FileStream(File,FileMode.OpenOrCreate))
             {
                 ms.WriteTo(stream);
                 stream.Close();
             }
             ms.Dispose();
+            
         }
     }
 }

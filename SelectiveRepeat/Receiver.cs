@@ -78,8 +78,8 @@ namespace SelectiveRepeat
                 ReceiveSocket.ReceiveFrom(buffer, ref SenderAdress);
                 if(ExpSeq.Contains(buffer[0]))
                 {
+                    Console.WriteLine("Received Packet " + buffer[0]);
                     BufferData(buffer);
-                    Console.WriteLine("Received Packet: " + buffer[0] + Encoding.ASCII.GetString(buffer,1,buffer.Length-1));
                 }
                 SendSocket.SendTo(new byte[] { buffer[0] }, ServerAddress);
             } while (buffer[0]!=255);
