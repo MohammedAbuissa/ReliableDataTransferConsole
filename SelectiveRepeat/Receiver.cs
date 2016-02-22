@@ -63,6 +63,7 @@ namespace SelectiveRepeat
             }
             
         }
+        int counter = 0;
         public void Receive()
         {
             EndPoint SenderAdress = new IPEndPoint(IPAddress.Any, 0);
@@ -78,8 +79,12 @@ namespace SelectiveRepeat
                 ReceiveSocket.ReceiveFrom(buffer, ref SenderAdress);
                 if(ExpSeq.Contains(buffer[0]))
                 {
-                    Console.WriteLine("Received Packet " + buffer[0]);
+                    Console.WriteLine("Received Packet " + buffer[0]+ " "+counter++);
                     BufferData(buffer);
+                }
+                else
+                {
+                    Console.WriteLine("Received duplicate packet" + buffer[0]);
                 }
                 SendSocket.SendTo(new byte[] { buffer[0] }, ServerAddress);
             } while (buffer[0]!=255);
@@ -93,7 +98,7 @@ namespace SelectiveRepeat
             {
                 byte[] Dummy = new byte[Packet.Length - 1];
                 Array.Copy(Buffer[0].Packet, 1, Dummy, 0, Dummy.Length);
-                ReceivedData.Trunk.Add(Dummy);
+                ReceivedData.AddData(Dummy);
                 Buffer.RemoveAt(0);
                 Buffer.Add(new Frame(NextSeqNumber++));
                 Base++;

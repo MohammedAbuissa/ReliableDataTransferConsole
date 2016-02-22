@@ -10,7 +10,7 @@ namespace Utility
     {
         private int PacketSize;
         private int LastAccess = 0;
-        public List<byte[]> Trunk { get; private set; }
+        private List<byte[]> Trunk { get; set; }
         public byte[] NextPacket {
             get
             {
@@ -20,6 +20,7 @@ namespace Utility
                     return null;
             }
         }
+        public int NumberofPackets { get { return Trunk.Count; } }
         public PacketTrunk(int PacketSize)
         {
             this.PacketSize = PacketSize;
@@ -27,6 +28,10 @@ namespace Utility
             Trunk.Add(new byte[PacketSize]);
         } 
 
+        public void AddData(byte[] Dataium)
+        {
+            Trunk.Add(Dataium);
+        }
         public void AddData(Stream DataStream)
         {
             using (Stream reader = DataStream)

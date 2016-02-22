@@ -77,6 +77,8 @@ namespace SelectiveRepeat
                 if(dummy !=null)
                     Buffer.Add(new Frame(ExpectedSequenceNumber++, dummy));
             }
+            Console.WriteLine(Packet.NumberofPackets);
+            Console.Read();
             ReceiveThread.Start();
             AckTimer.Start();
             ReceiveThread.Join();
@@ -127,7 +129,6 @@ namespace SelectiveRepeat
             {
                 if (Me)//AckReceiver
                 {
-                    //#todo: move the window
 #if DEBUG
                     Console.WriteLine("Ack " + DeliverTo);
 #endif
@@ -147,10 +148,6 @@ namespace SelectiveRepeat
                         if (temporary != null)
                         {
                             Buffer.Add(new Frame(ExpectedSequenceNumber++, temporary));
-                        }
-                        else
-                        {
-                            SequenceNumberRange--; //approuching end of buffer
                         }
                     }
                     if (Buffer.Count < 1)
